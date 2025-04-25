@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rick_and_morty_characters/core/init.dart';
+import 'package:rick_and_morty_characters/core/theme/theme.dart';
+import 'package:rick_and_morty_characters/features/charactes_list/bloc/characters_list_bloc.dart';
+import 'package:rick_and_morty_characters/features/charactes_list/view/pages/characters_list_page.dart';
 import 'package:rick_and_morty_characters/features/home_page.dart';
 
 class RickAndMortyApp extends StatelessWidget {
@@ -6,13 +11,16 @@ class RickAndMortyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => getIt<CharactersListBloc>()),
+      ],
+
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: lightTheme,
+        home: CharactersListPage(),
       ),
-      home: HomePage(),
     );
   }
 }

@@ -11,35 +11,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final CharactersRepository repository = CharactersRepository();
-
-  List<Character> characters = [];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: IconButton(
-        onPressed: () async {
-          characters = await repository.getCharactersPage(1);
-          print(characters.length);
-          setState(() {});
-        },
-        icon: Icon(Icons.add),
-      ),
-      body:
-          characters.isEmpty
-              ? Center(child: Text('Не загружено'))
-              : ListView.builder(
-                itemCount: characters.length,
-                itemBuilder: (context, index) {
-                  final character = characters[index];
-                  return CharacterCard(
-                    character: character,
-                    onFavoriteTap: () {},
-                  );
-                  // return Text(character.name);
-                },
-              ),
+      body:Text('data'),
+         
     );
   }
 }
