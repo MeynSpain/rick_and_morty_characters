@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -18,6 +19,7 @@ class CharactersListBloc
   CharactersListBloc({required this.repository})
     : super(CharactersListState.initial()) {
     on<CharactersListGetListEvent>(_getList);
+    on<CharactersListToggleFavoriteEvent>(_addFavorite);
   }
 
   Future<void> _getList(
@@ -44,6 +46,36 @@ class CharactersListBloc
           errorMessage: 'Something went wrong',
         ),
       );
+    }
+  }
+
+  Future<void> _addFavorite(
+    CharactersListToggleFavoriteEvent event,
+    Emitter<CharactersListState> emit,
+  ) async {
+    try {
+      // emit(state.copyWith(
+      //   status: CharactersListStatus.loading,
+      // ));
+
+      final characters = List<Character>.from(state.characters);
+
+      int index = characters.indexOf(event.character);
+
+      characters[index] = characters[index].copyWith(
+        isFavorite: !characters[index].isFavorite,
+      );
+
+      await repository.saveCharacter(characters[index]);
+
+      emit(
+        state.copyWith(
+          status: CharactersListStatus.success,
+          characters: characters,
+        ),
+      );
+    } catch (e, st) {
+      log('$e');
     }
   }
 }

@@ -12,3 +12,11 @@ class CharactersListGetListEvent extends CharactersListEvent {
   List<Object?> get props => [page];
 }
 
+class CharactersListToggleFavoriteEvent extends CharactersListEvent {
+  final Character character;
+
+  CharactersListToggleFavoriteEvent({required this.character});
+
+  @override
+  List<Object?> get props => [character];
+}

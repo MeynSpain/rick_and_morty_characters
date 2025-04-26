@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rick_and_morty_characters/core/const/status/characters_list_status.dart';
+import 'package:rick_and_morty_characters/core/const/status/favorite_status.dart';
 import 'package:rick_and_morty_characters/core/init.dart';
-import 'package:rick_and_morty_characters/core/model/character.dart';
 import 'package:rick_and_morty_characters/features/characters_list/bloc/characters_list_bloc.dart';
 import 'package:rick_and_morty_characters/features/characters_list/view/widgets/character_card.dart';
 import 'package:rick_and_morty_characters/features/characters_list/view/widgets/search_button.dart';
 import 'package:rick_and_morty_characters/features/favorite/bloc/favorite_bloc.dart';
 
-class CharactersListPage extends StatefulWidget {
-  const CharactersListPage({super.key});
-
-  @override
-  State<CharactersListPage> createState() => _CharactersListPageState();
-}
-
-class _CharactersListPageState extends State<CharactersListPage> {
-  @override
-  void initState() {
-    getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
-    super.initState();
-  }
+class FavoritePage extends StatelessWidget {
+  const FavoritePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +16,7 @@ class _CharactersListPageState extends State<CharactersListPage> {
     return Scaffold(
       floatingActionButton: IconButton(
         onPressed: () {
-          getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
+          getIt<FavoriteBloc>().add(FavoriteGetCharactersEvent());
         },
         icon: Icon(Icons.download),
         color: theme.primaryColor,
@@ -50,30 +38,38 @@ class _CharactersListPageState extends State<CharactersListPage> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
-          BlocConsumer<CharactersListBloc, CharactersListState>(
-            listener: _handleCharacterListState,
-            bloc: getIt<CharactersListBloc>(),
+          BlocBuilder<FavoriteBloc, FavoriteState>(
+            bloc: getIt<FavoriteBloc>(),
             builder: (context, state) {
-              if (state.status == CharactersListStatus.success) {
+              if (state.status == FavoriteStatus.success) {
                 return SliverList.builder(
-                  itemCount: state.characters.length,
+                  itemCount: state.favoriteCharacters.length,
                   itemBuilder:
                       (context, index) => Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: CharacterCard(
-                          character: state.characters[index],
-                          onFavoriteTap:
-                              () => _onFavoriteTap(state.characters[index]),
+                          character: state.favoriteCharacters[index],
+                          onFavoriteTap: () {
+                            final character = state.favoriteCharacters[index];
+                            getIt<FavoriteBloc>().add(
+                              FavoriteToggleEvent(character: character),
+                            );
+                            getIt<CharactersListBloc>().add(
+                              CharactersListToggleFavoriteEvent(
+                                character: character,
+                              ),
+                            );
+                          },
                         ),
                       ),
                 );
               }
-              if (state.status == CharactersListStatus.loading) {
+              if (state.status == FavoriteStatus.loading) {
                 return const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
-              if (state.status == CharactersListStatus.error) {
+              if (state.status == FavoriteStatus.error) {
                 return SliverFillRemaining(
                   child: Center(child: Text(state.errorMessage)),
                 );
@@ -84,18 +80,5 @@ class _CharactersListPageState extends State<CharactersListPage> {
         ],
       ),
     );
-  }
-
-  void _onFavoriteTap(Character character) {
-    getIt<CharactersListBloc>().add(
-      CharactersListToggleFavoriteEvent(character: character),
-    );
-  }
-
-  void _handleCharacterListState(
-    BuildContext context,
-    CharactersListState state,
-  ) {
-    getIt<FavoriteBloc>().add(FavoriteGetCharactersEvent());
   }
 }

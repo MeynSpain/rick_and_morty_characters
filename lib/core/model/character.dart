@@ -71,6 +71,30 @@ class Character extends Equatable {
     };
   }
 
+  Character copyWith({
+    int? id,
+    String? name,
+    String? status,
+    String? species,
+    String? type,
+    String? gender,
+    String? origin,
+    String? image,
+    bool? isFavorite,
+  }) {
+    return Character(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      status: status ?? this.status,
+      species: species ?? this.species,
+      type: type ?? this.type,
+      gender: gender ?? this.gender,
+      origin: origin ?? this.origin,
+      image: image ?? this.image,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -81,5 +105,6 @@ class Character extends Equatable {
     gender,
     origin,
     image,
+    isFavorite,
   ];
 }
