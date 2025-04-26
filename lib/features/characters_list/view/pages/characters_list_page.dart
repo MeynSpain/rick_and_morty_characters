@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_characters/core/const/status/characters_list_status.dart';
 import 'package:rick_and_morty_characters/core/init.dart';
 import 'package:rick_and_morty_characters/core/model/character.dart';
-import 'package:rick_and_morty_characters/features/charactes_list/bloc/characters_list_bloc.dart';
-import 'package:rick_and_morty_characters/features/charactes_list/view/widgets/character_card.dart';
-import 'package:rick_and_morty_characters/features/charactes_list/view/widgets/search_button.dart';
+import 'package:rick_and_morty_characters/features/characters_list/bloc/characters_list_bloc.dart';
+import 'package:rick_and_morty_characters/features/characters_list/view/widgets/character_card.dart';
+import 'package:rick_and_morty_characters/features/characters_list/view/widgets/search_button.dart';
 
 class CharactersListPage extends StatefulWidget {
   const CharactersListPage({super.key});
@@ -25,6 +25,13 @@ class _CharactersListPageState extends State<CharactersListPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      floatingActionButton: IconButton(
+        onPressed: () {
+          getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
+        },
+        icon: Icon(Icons.download),
+        color: theme.primaryColor,
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(

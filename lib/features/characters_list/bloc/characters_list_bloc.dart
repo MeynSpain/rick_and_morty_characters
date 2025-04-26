@@ -17,10 +17,6 @@ class CharactersListBloc
 
   CharactersListBloc({required this.repository})
     : super(CharactersListState.initial()) {
-    on<CharactersListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<CharactersListGetListEvent>(_getList);
   }
 

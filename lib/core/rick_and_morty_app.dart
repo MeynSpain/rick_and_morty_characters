@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_characters/core/init.dart';
 import 'package:rick_and_morty_characters/core/theme/theme.dart';
-import 'package:rick_and_morty_characters/features/charactes_list/bloc/characters_list_bloc.dart';
-import 'package:rick_and_morty_characters/features/charactes_list/view/pages/characters_list_page.dart';
+import 'package:rick_and_morty_characters/features/characters_list/bloc/characters_list_bloc.dart';
+import 'package:rick_and_morty_characters/features/characters_list/view/pages/characters_list_page.dart';
 import 'package:rick_and_morty_characters/features/home_page.dart';
 
 class RickAndMortyApp extends StatelessWidget {

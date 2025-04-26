@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_characters/core/model/character.dart';
 
@@ -26,10 +27,14 @@ class _CharacterCardState extends State<CharacterCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(character.image),
-              radius: 30,
+            leading: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: character.image,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(Icons.error_outline),
+              ),
             ),
+
             title: Text(character.name),
             subtitle: Text('${character.species} - ${character.status}'),
             trailing: IconButton(
