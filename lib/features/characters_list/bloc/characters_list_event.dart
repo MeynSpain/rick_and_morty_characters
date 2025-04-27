@@ -5,11 +5,12 @@ abstract class CharactersListEvent extends Equatable {}
 
 class CharactersListGetListEvent extends CharactersListEvent {
   final int page;
+  final Completer? completer;
 
-  CharactersListGetListEvent({required this.page});
+  CharactersListGetListEvent({required this.page, this.completer});
 
   @override
-  List<Object?> get props => [page];
+  List<Object?> get props => [page, completer,];
 }
 
 class CharactersListToggleFavoriteEvent extends CharactersListEvent {

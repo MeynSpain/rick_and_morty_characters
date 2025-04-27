@@ -27,12 +27,7 @@ class CharactersRepository {
       // Если проблемы с сетью
       getIt<Talker>().handle(e, st);
 
-      // TODO: нужно сделать подгрузку из hive
-      final characters = characterBox.values.toList();
-      apiResponse = ApiResponse(
-        info: Info(currentPage: 1, totalPage: 42),
-        characters: characters,
-      );
+      apiResponse = _fetchCharactersFromHive(page);
     }
 
     return apiResponse;
@@ -82,6 +77,29 @@ class CharactersRepository {
       }
       await characterBox.put(character.id, character);
     }
+  }
+
+  ApiResponse _fetchCharactersFromHive(int page) {
+    const int pageSize = 20;
+
+    final countCharacters = characterBox.values.length;
+
+    int pages = countCharacters ~/ pageSize + 1;
+
+    final characters =
+        characterBox
+            .valuesBetween(
+              startKey: (page - 1) * pageSize + 1,
+              endKey: page * pageSize,
+            )
+            .toList();
+
+    final apiResponse = ApiResponse(
+      info: Info(currentPage: page, totalPage: pages),
+      characters: characters,
+    );
+
+    return apiResponse;
   }
 
   Future<void> saveCharacter(Character character) async {

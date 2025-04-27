@@ -65,6 +65,8 @@ class CharactersListBloc
           errorMessage: 'Something went wrong',
         ),
       );
+    } finally {
+      event.completer?.complete();
     }
   }
 

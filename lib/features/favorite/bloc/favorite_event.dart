@@ -4,8 +4,12 @@ part of 'favorite_bloc.dart';
 abstract class FavoriteEvent extends Equatable {}
 
 class FavoriteGetCharactersEvent extends FavoriteEvent {
+  final Completer? completer;
+
+  FavoriteGetCharactersEvent({this.completer});
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [completer];
 }
 
 class FavoriteToggleEvent extends FavoriteEvent {
@@ -15,4 +19,14 @@ class FavoriteToggleEvent extends FavoriteEvent {
 
   @override
   List<Object?> get props => [character];
+}
+
+class FavoriteSortEvent extends FavoriteEvent {
+  final String sortOption;
+  final bool isAscending;
+
+  FavoriteSortEvent({required this.sortOption, required this.isAscending});
+
+  @override
+  List<Object?> get props => [sortOption, isAscending];
 }
