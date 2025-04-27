@@ -2,8 +2,12 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:rick_and_morty_characters/core/init.dart';
+import 'package:rick_and_morty_characters/core/model/api_response.dart';
 
 import 'package:rick_and_morty_characters/core/model/character.dart';
+import 'package:rick_and_morty_characters/core/model/info.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 class CharactersRepository {
   final Dio dio;
@@ -11,22 +15,27 @@ class CharactersRepository {
 
   CharactersRepository({required this.characterBox, required this.dio});
 
-  Future<List<Character>> getCharactersPage(int page) async {
-    List<Character> characters = [];
+  Future<ApiResponse> getCharactersPage(int page) async {
+    ApiResponse apiResponse;
 
     try {
-      characters = await _fetchCharactersFromApi(page);
+      // Если нет проблем с сетью
+      apiResponse = await _fetchCharactersFromApi(page);
 
-      await _saveCharactersToHive(characters);
-
-      final result = characterBox.values.toList();
+      await _saveCharactersToHive(apiResponse.characters);
     } catch (e, st) {
-      log('$e');
+      // Если проблемы с сетью
+      getIt<Talker>().handle(e, st);
 
-      characters = characterBox.values.toList();
+      // TODO: нужно сделать подгрузку из hive
+      final characters = characterBox.values.toList();
+      apiResponse = ApiResponse(
+        info: Info(currentPage: 1, totalPage: 42),
+        characters: characters,
+      );
     }
 
-    return characters;
+    return apiResponse;
   }
 
   List<Character> getFavoriteCharacters() {
@@ -36,18 +45,22 @@ class CharactersRepository {
     return favoriteCharacters;
   }
 
-  Future<List<Character>> _fetchCharactersFromApi(int page) async {
+  Future<ApiResponse> _fetchCharactersFromApi(int page) async {
     final response = await dio
         .get('https://rickandmortyapi.com/api/character/?page=$page')
-        .timeout(Duration(seconds: 2));
+        .timeout(Duration(seconds: 3));
 
     final data = response.data as Map<String, dynamic>;
+
+    final jsonInfo = data['info'] as Map<String, dynamic>;
+
+    final info = Info.fromJson(jsonInfo);
 
     final results = data['results'] as List<dynamic>;
 
     final characters = results.map((json) => Character.fromJson(json)).toList();
 
-    return characters;
+    return ApiResponse(info: info, characters: characters);
   }
 
   Future<void> _saveCharactersToHive(List<Character> characters) async {

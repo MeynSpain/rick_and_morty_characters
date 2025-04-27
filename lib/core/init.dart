@@ -25,7 +25,7 @@ Future<void> init() async {
   Bloc.observer = TalkerBlocObserver(
       talker: talker,
       settings: const TalkerBlocLoggerSettings(
-        printEventFullData: false,
+        printEventFullData: true,
         printStateFullData: true,
       ));
 
@@ -43,4 +43,7 @@ Future<void> init() async {
   getIt.registerLazySingleton(() => CharactersListBloc(repository: repository));
 
   getIt.registerLazySingleton(() => FavoriteBloc(repository: repository));
+
+
+  getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
 }

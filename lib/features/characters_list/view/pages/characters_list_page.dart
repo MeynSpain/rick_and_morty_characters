@@ -15,11 +15,50 @@ class CharactersListPage extends StatefulWidget {
   State<CharactersListPage> createState() => _CharactersListPageState();
 }
 
-class _CharactersListPageState extends State<CharactersListPage> {
+class _CharactersListPageState extends State<CharactersListPage> with AutomaticKeepAliveClientMixin{
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
-    getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
+    _scrollController.addListener(_onScroll);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    final currentState = getIt<CharactersListBloc>().state;
+
+    if (currentState.status == CharactersListStatus.loading) return;
+
+    if (currentScroll >= maxScroll) {
+      if (currentState.status == CharactersListStatus.success &&
+          currentState.currentPage < currentState.totalPage) {
+
+
+        if (currentState.status == CharactersListStatus.loading) return;
+        getIt<CharactersListBloc>().add(
+          CharactersListGetListEvent(page: currentState.currentPage + 1),
+        );
+
+        Future.delayed(Duration(milliseconds: 50), () {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent + 100,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+      }
+    }
   }
 
   @override
@@ -34,6 +73,7 @@ class _CharactersListPageState extends State<CharactersListPage> {
         color: theme.primaryColor,
       ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           SliverAppBar(
             pinned: true,
@@ -54,21 +94,50 @@ class _CharactersListPageState extends State<CharactersListPage> {
             listener: _handleCharacterListState,
             bloc: getIt<CharactersListBloc>(),
             builder: (context, state) {
-              if (state.status == CharactersListStatus.success) {
+              if (state.status == CharactersListStatus.success ||
+                  state.status == CharactersListStatus.loading) {
                 return SliverList.builder(
-                  itemCount: state.characters.length,
-                  itemBuilder:
-                      (context, index) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: CharacterCard(
-                          character: state.characters[index],
-                          onFavoriteTap:
-                              () => _onFavoriteTap(state.characters[index]),
+                  itemCount:
+                      state.status == CharactersListStatus.loading ||
+                              state.currentPage == state.totalPage
+                          ? state.characters.length +
+                              1 // +1 для индикатора загрузки
+                          : state.characters.length,
+                  itemBuilder: (context, index) {
+                    if (index == state.characters.length &&
+                        state.status == CharactersListStatus.loading) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+
+                    if (index == state.characters.length &&
+                        state.currentPage >= state.totalPage) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Center(
+                          child: Text(
+                            'No more characters load',
+                            style: theme.textTheme.bodyMedium,
+                          ),
                         ),
+                      );
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: CharacterCard(
+                        character: state.characters[index],
+                        onFavoriteTap:
+                            () => _onFavoriteTap(state.characters[index]),
                       ),
+                    );
+                  },
                 );
               }
-              if (state.status == CharactersListStatus.loading) {
+              if (state.status == CharactersListStatus.loading &&
+                  state.characters.isEmpty) {
                 return const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
                 );
@@ -98,4 +167,8 @@ class _CharactersListPageState extends State<CharactersListPage> {
   ) {
     getIt<FavoriteBloc>().add(FavoriteGetCharactersEvent());
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

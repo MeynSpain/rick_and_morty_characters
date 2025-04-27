@@ -35,7 +35,7 @@ class _CharacterCardState extends State<CharacterCard> {
               ),
             ),
 
-            title: Text(character.name),
+            title: Text('${character.id} - ${character.name}'),
             subtitle: Text('${character.species} - ${character.status}'),
             trailing: IconButton(
               onPressed: widget.onFavoriteTap,
