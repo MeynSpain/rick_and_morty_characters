@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_characters/core/const/status/favorite_status.dart';
 import 'package:rick_and_morty_characters/core/init.dart';
+import 'package:rick_and_morty_characters/core/model/character.dart';
 import 'package:rick_and_morty_characters/features/characters_list/bloc/characters_list_bloc.dart';
 import 'package:rick_and_morty_characters/features/characters_list/view/widgets/character_card.dart';
 import 'package:rick_and_morty_characters/features/characters_list/view/widgets/search_button.dart';
@@ -19,6 +20,17 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage>
     with AutomaticKeepAliveClientMixin {
+  String _searchText = '';
+  final ScrollController _scrollController = ScrollController();
+
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -26,18 +38,22 @@ class _FavoritePageState extends State<FavoritePage>
       body: RefreshIndicator(
         onRefresh: () async {
           final completer = Completer();
-          getIt<FavoriteBloc>().add(
-            FavoriteGetCharactersEvent(completer: completer),
-          );
+          if (_searchController.text.isEmpty) {
+            getIt<FavoriteBloc>().add(
+              FavoriteGetCharactersEvent(completer: completer),
+            );
+          } else {
+            _onClear(completer: completer);
+          }
           return completer.future;
         },
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverAppBar(
               pinned: true,
               snap: true,
               floating: true,
-              // backgroundColor: theme.primaryColor,
               title: Text(
                 'Rick and Morty',
                 style: theme.textTheme.headlineLarge,
@@ -50,8 +66,13 @@ class _FavoritePageState extends State<FavoritePage>
                 ),
               ],
               bottom: PreferredSize(
-                preferredSize: Size.fromHeight(70),
-                child: SearchButton(onSearch: (text) {}, onClear: () {}),
+                preferredSize: Size.fromHeight(80),
+                child: SearchButton(
+                  isSearching: false,
+                  controller: _searchController,
+                  onSearch: (value) => _onSearch(value),
+                  onClear: _onClear,
+                ),
               ),
             ),
 
@@ -68,17 +89,10 @@ class _FavoritePageState extends State<FavoritePage>
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: CharacterCard(
                             character: state.favoriteCharacters[index],
-                            onFavoriteTap: () {
-                              final character = state.favoriteCharacters[index];
-                              getIt<FavoriteBloc>().add(
-                                FavoriteToggleEvent(character: character),
-                              );
-                              getIt<CharactersListBloc>().add(
-                                CharactersListToggleFavoriteEvent(
-                                  character: character,
+                            onFavoriteTap:
+                                () => _onFavoriteTap(
+                                  state.favoriteCharacters[index],
                                 ),
-                              );
-                            },
                           ),
                         ),
                   );
@@ -96,9 +110,20 @@ class _FavoritePageState extends State<FavoritePage>
                 return SliverFillRemaining();
               },
             ),
+            // Чтобы Рефреш индикатор работал
+            SliverFillRemaining(
+              child: Center(child: Text('No more characters load')),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  void _onFavoriteTap(Character character) {
+    getIt<FavoriteBloc>().add(FavoriteToggleEvent(character: character));
+    getIt<CharactersListBloc>().add(
+      CharactersListToggleFavoriteEvent(character: character),
     );
   }
 
@@ -109,6 +134,36 @@ class _FavoritePageState extends State<FavoritePage>
       builder: (context) {
         return SingleChildScrollView(child: SortBottomSheet());
       },
+    );
+  }
+
+  void _onClear({Completer? completer}) {
+    if (_searchText.isNotEmpty) {
+      _searchText = '';
+      _searchController.clear();
+
+      getIt<FavoriteBloc>().add(
+        FavoriteGetCharactersEvent(completer: completer),
+      );
+
+      _scrollToTop();
+    }
+  }
+
+  void _onSearch(text) {
+    if (text.isNotEmpty) {
+      _searchText = text;
+      getIt<FavoriteBloc>().add(FavoriteSearchEvent(name: _searchText));
+
+      _scrollToTop();
+    }
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
 

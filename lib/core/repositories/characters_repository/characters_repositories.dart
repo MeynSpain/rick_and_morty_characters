@@ -106,7 +106,7 @@ class CharactersRepository {
     await characterBox.put(character.id, character);
   }
 
-  Future<ApiResponse> getCharacterByName(String name, {int page = 1}) async {
+  Future<ApiResponse> getCharactersByName(String name, {int page = 1}) async {
     ApiResponse apiResponse;
 
     try {
@@ -148,9 +148,13 @@ class CharactersRepository {
   ApiResponse _fetchCharactersByNameFromHive(String name, int page) {
     const int pageSize = 20;
 
-    final charactersByName = characterBox.values.where(
-      (character) => character.name.toLowerCase().contains(name.toLowerCase()),
-    ).toList();
+    final charactersByName =
+        characterBox.values
+            .where(
+              (character) =>
+                  character.name.toLowerCase().contains(name.toLowerCase()),
+            )
+            .toList();
 
     final countCharacters = charactersByName.length;
     print('Что нашел');
@@ -169,5 +173,18 @@ class CharactersRepository {
     );
 
     return apiResponse;
+  }
+
+  List<Character> getFavoriteCharactersByNameFromHive(String name) {
+    final charactersByName =
+        characterBox.values
+            .where(
+              (character) =>
+                  character.name.toLowerCase().contains(name.toLowerCase()) &&
+                  character.isFavorite,
+            )
+            .toList();
+
+    return charactersByName;
   }
 }

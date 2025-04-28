@@ -81,11 +81,17 @@ class CharactersListBloc
 
       int index = characters.indexOf(event.character);
 
-      characters[index] = characters[index].copyWith(
-        isFavorite: !characters[index].isFavorite,
-      );
+      if (index != -1) {
+        characters[index] = characters[index].copyWith(
+          isFavorite: !characters[index].isFavorite,
+        );
+        await repository.saveCharacter(characters[index]);
+      } else {
+        event.character.isFavorite = false;
+        await repository.saveCharacter(event.character);
+      }
 
-      await repository.saveCharacter(characters[index]);
+
 
       emit(
         state.copyWith(
@@ -103,9 +109,9 @@ class CharactersListBloc
     Emitter<CharactersListState> emit,
   ) async {
     try {
-      emit(state.copyWith(status: CharactersListStatus.loading));
+      emit(state.copyWith(status: CharactersListStatus.searching));
 
-      final apiResponse = await repository.getCharacterByName(
+      final apiResponse = await repository.getCharactersByName(
         event.name,
         page: event.page,
       );
@@ -132,4 +138,6 @@ class CharactersListBloc
       );
     }
   }
+
+
 }

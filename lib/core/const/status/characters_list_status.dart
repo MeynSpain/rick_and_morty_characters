@@ -3,4 +3,5 @@ enum CharactersListStatus {
   loading,
   success,
   error,
+  searching,
 }

@@ -27,6 +27,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
     on<FavoriteGetCharactersEvent>(_getCharacters);
     on<FavoriteToggleEvent>(_toggleEvent);
     on<FavoriteSortEvent>(_sort);
+    on<FavoriteSearchEvent>(_search);
   }
 
   FutureOr<void> _getCharacters(
@@ -46,8 +47,12 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
         ),
       );
 
-      add(FavoriteSortEvent(sortOption: state.currentOption, isAscending: state.isAscending));
-
+      add(
+        FavoriteSortEvent(
+          sortOption: state.currentOption,
+          isAscending: state.isAscending,
+        ),
+      );
     } catch (e, st) {
       getIt<Talker>().handle(e, st);
       emit(
@@ -145,7 +150,6 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
           currentOption: event.sortOption,
         ),
       );
-
     } catch (e, st) {
       getIt<Talker>().handle(e, st);
 
@@ -153,6 +157,42 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
         state.copyWith(
           status: FavoriteStatus.error,
           errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  FutureOr<void> _search(
+    FavoriteSearchEvent event,
+    Emitter<FavoriteState> emit,
+  ) {
+    try {
+      emit(state.copyWith(status: FavoriteStatus.loading));
+
+      final charactersByName = repository.getFavoriteCharactersByNameFromHive(
+        event.name,
+      );
+
+      emit(
+        state.copyWith(
+          status: FavoriteStatus.success,
+          favoriteCharacters: charactersByName,
+        ),
+      );
+
+      add(
+        FavoriteSortEvent(
+          sortOption: state.currentOption,
+          isAscending: state.isAscending,
+        ),
+      );
+    } catch (e, st) {
+      getIt<Talker>().handle(e, st);
+
+      emit(
+        state.copyWith(
+          status: FavoriteStatus.error,
+          errorMessage: 'Couldn\'t complete the search',
         ),
       );
     }

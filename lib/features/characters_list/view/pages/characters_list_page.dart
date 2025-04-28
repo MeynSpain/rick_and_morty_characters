@@ -20,6 +20,7 @@ class CharactersListPage extends StatefulWidget {
 class _CharactersListPageState extends State<CharactersListPage>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
 
   String _searchText = '';
 
@@ -81,9 +82,14 @@ class _CharactersListPageState extends State<CharactersListPage>
       body: RefreshIndicator(
         onRefresh: () async {
           final completer = Completer();
-          getIt<CharactersListBloc>().add(
-            CharactersListGetListEvent(page: 1, completer: completer),
-          );
+
+          if (_searchController.text.isEmpty) {
+            getIt<CharactersListBloc>().add(
+              CharactersListGetListEvent(page: 1, completer: completer),
+            );
+          } else {
+            _onClear(completer: completer);
+          }
           return completer.future;
         },
         child: CustomScrollView(
@@ -101,7 +107,18 @@ class _CharactersListPageState extends State<CharactersListPage>
               expandedHeight: 150,
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(80),
-                child: SearchButton(onSearch: _onSearch, onClear: _onClear),
+                child: BlocBuilder<CharactersListBloc, CharactersListState>(
+                  builder: (context, state) {
+                    return SearchButton(
+                      isSearching:
+                          getIt<CharactersListBloc>().state.status ==
+                          CharactersListStatus.searching,
+                      controller: _searchController,
+                      onSearch: _onSearch,
+                      onClear: _onClear,
+                    );
+                  },
+                ),
               ),
             ),
 
@@ -112,7 +129,8 @@ class _CharactersListPageState extends State<CharactersListPage>
               bloc: getIt<CharactersListBloc>(),
               builder: (context, state) {
                 if (state.status == CharactersListStatus.success ||
-                    state.status == CharactersListStatus.loading) {
+                    state.status == CharactersListStatus.loading ||
+                state.status == CharactersListStatus.searching) {
                   return SliverList.builder(
                     itemCount:
                         state.status == CharactersListStatus.loading ||
@@ -173,22 +191,27 @@ class _CharactersListPageState extends State<CharactersListPage>
     );
   }
 
-  void _onClear() {
+  void _onClear({Completer? completer}) {
     if (_searchText.isNotEmpty) {
       _searchText = '';
-      getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
+      _searchController.clear();
+      getIt<CharactersListBloc>().add(
+        CharactersListGetListEvent(page: 1, completer: completer),
+      );
 
       _scrollToTop();
     }
   }
 
   _onSearch(text) {
-    _searchText = text;
-    getIt<CharactersListBloc>().add(
-      CharactersListSearchEvent(name: _searchText, page: 1),
-    );
+    if (_searchController.text.trim().isNotEmpty) {
+      _searchText = text;
+      getIt<CharactersListBloc>().add(
+        CharactersListSearchEvent(name: _searchText, page: 1),
+      );
 
-    _scrollToTop();
+      _scrollToTop();
+    }
   }
 
   void _onFavoriteTap(Character character) {

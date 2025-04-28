@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 class SearchButton extends StatefulWidget {
   final Function(String) onSearch;
   final VoidCallback onClear;
+  final TextEditingController controller;
+  bool isSearching;
 
-  const SearchButton({super.key, required this.onSearch, required this.onClear});
+  SearchButton({
+    super.key,
+    required this.onSearch,
+    required this.onClear,
+    required this.controller,
+    required this.isSearching,
+  });
 
   @override
   State<SearchButton> createState() => _SearchButtonState();
@@ -26,28 +34,25 @@ class _SearchButtonState extends State<SearchButton> {
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: theme.hintColor),
+          widget.isSearching
+              ? CircularProgressIndicator()
+              : Icon(Icons.search, color: theme.hintColor),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
-              controller: _searchController,
+              controller: widget.controller,
               decoration: InputDecoration(
                 hintText: 'Search...',
                 border: InputBorder.none,
                 hintStyle: TextStyle(color: theme.hintColor),
               ),
               style: theme.textTheme.bodyMedium,
-              onSubmitted: (_) => widget.onSearch(_searchController.text.trim()),
+              onSubmitted:
+                  (_) => widget.onSearch(widget.controller.text.trim()),
             ),
           ),
 
-          IconButton(
-            onPressed: () {
-              _searchController.clear();
-              widget.onClear();
-            },
-            icon: Icon(Icons.clear),
-          ),
+          IconButton(onPressed: widget.onClear, icon: Icon(Icons.clear)),
         ],
       ),
     );
