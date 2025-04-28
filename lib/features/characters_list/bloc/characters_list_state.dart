@@ -6,6 +6,7 @@ class CharactersListState extends Equatable {
   final String errorMessage;
   final int currentPage;
   final int totalPage;
+  final bool isSearch;
 
   const CharactersListState._({
     required this.characters,
@@ -13,6 +14,7 @@ class CharactersListState extends Equatable {
     required this.errorMessage,
     required this.currentPage,
     required this.totalPage,
+    required this.isSearch,
   });
 
   factory CharactersListState.initial() {
@@ -22,6 +24,7 @@ class CharactersListState extends Equatable {
       errorMessage: '',
       currentPage: 1,
       totalPage: 42,
+      isSearch: false,
     );
   }
 
@@ -31,6 +34,7 @@ class CharactersListState extends Equatable {
     String? errorMessage,
     int? currentPage,
     int? totalPage,
+    bool? isSearch,
   }) {
     return CharactersListState._(
       characters: characters ?? this.characters,
@@ -38,6 +42,7 @@ class CharactersListState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
       currentPage: currentPage ?? this.currentPage,
       totalPage: totalPage ?? this.totalPage,
+      isSearch: isSearch ?? this.isSearch,
     );
   }
 
@@ -48,5 +53,6 @@ class CharactersListState extends Equatable {
     errorMessage,
     currentPage,
     totalPage,
+    isSearch,
   ];
 }

@@ -23,16 +23,18 @@ class _CharacterCardState extends State<CharacterCard>
   late final AnimationController _animationController;
   late final Animation<double> _scaleAnimation;
 
-
   @override
   void initState() {
     super.initState();
 
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
 
     _scaleAnimation = Tween(begin: 1.0, end: 1.5).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -40,7 +42,6 @@ class _CharacterCardState extends State<CharacterCard>
     _animationController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +60,14 @@ class _CharacterCardState extends State<CharacterCard>
               ),
             ),
 
-            title: Text('${character.id} - ${character.name}'),
-            subtitle: Text('${character.species} - ${character.status}'),
+            title: Text(
+              '${character.id} - ${character.name}',
+              style: theme.textTheme.titleMedium,
+            ),
+            subtitle: Text(
+              '${character.species} - ${character.status}',
+              style: theme.textTheme.titleSmall,
+            ),
             trailing: AnimatedBuilder(
               animation: _scaleAnimation,
               builder: (context, child) {
@@ -68,19 +75,19 @@ class _CharacterCardState extends State<CharacterCard>
                   scale: _scaleAnimation.value,
                   child: IconButton(
                     onPressed: () {
-                      _animationController.forward().then((_) =>
-                          _animationController.reverse());
+                      _animationController.forward().then(
+                        (_) => _animationController.reverse(),
+                      );
                       widget.onFavoriteTap();
                     },
                     icon:
-                    character.isFavorite
-                        ? Icon(Icons.star)
-                        : Icon(Icons.star_border),
+                        character.isFavorite
+                            ? Icon(Icons.star)
+                            : Icon(Icons.star_border),
                     color: character.isFavorite ? Colors.amber : null,
                   ),
                 );
               },
-
             ),
           ),
           AnimatedCrossFade(
@@ -89,30 +96,35 @@ class _CharacterCardState extends State<CharacterCard>
             secondCurve: Curves.easeIn,
             firstChild: SizedBox(),
             crossFadeState:
-            _isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+                _isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
             secondChild:
-            _isExpanded
-                ? Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Type - ${character.type.isNotEmpty
-                        ? character.type
-                        : 'Unknown'}',
-                  ),
-                  Text('Gender - ${character.gender}'),
-                  Text('Origin - ${character.origin}'),
-                ],
-              ),
-            )
-                : SizedBox(),
+                _isExpanded
+                    ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Type - ${character.type.isNotEmpty ? character.type : 'Unknown'}',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                          Text(
+                            'Gender - ${character.gender}',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                          Text(
+                            'Origin - ${character.origin}',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    )
+                    : SizedBox(),
           ),
           InkWell(
             onTap: () {

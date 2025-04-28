@@ -22,6 +22,7 @@ class CharactersListBloc
     : super(CharactersListState.initial()) {
     on<CharactersListGetListEvent>(_getList);
     on<CharactersListToggleFavoriteEvent>(_addFavorite);
+    on<CharactersListSearchEvent>(_search);
   }
 
   Future<void> _getList(
@@ -49,6 +50,7 @@ class CharactersListBloc
       emit(
         state.copyWith(
           status: CharactersListStatus.success,
+          isSearch: false,
           characters:
               event.page == 1
                   ? apiResponse.characters
@@ -92,7 +94,42 @@ class CharactersListBloc
         ),
       );
     } catch (e, st) {
-      log('$e');
+      getIt<Talker>().handle(e, st);
+    }
+  }
+
+  Future<void> _search(
+    CharactersListSearchEvent event,
+    Emitter<CharactersListState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(status: CharactersListStatus.loading));
+
+      final apiResponse = await repository.getCharacterByName(
+        event.name,
+        page: event.page,
+      );
+
+      emit(
+        state.copyWith(
+          status: CharactersListStatus.success,
+          isSearch: true,
+          characters:
+              event.page == 1
+                  ? apiResponse.characters
+                  : [...state.characters, ...apiResponse.characters],
+          currentPage: apiResponse.info.currentPage,
+          totalPage: apiResponse.info.totalPage,
+        ),
+      );
+    } catch (e, st) {
+      getIt<Talker>().handle(e, st);
+      emit(
+        state.copyWith(
+          status: CharactersListStatus.error,
+          errorMessage: 'Couldn\'t complete the search',
+        ),
+      );
     }
   }
 }

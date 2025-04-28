@@ -105,4 +105,69 @@ class CharactersRepository {
   Future<void> saveCharacter(Character character) async {
     await characterBox.put(character.id, character);
   }
+
+  Future<ApiResponse> getCharacterByName(String name, {int page = 1}) async {
+    ApiResponse apiResponse;
+
+    try {
+      // Если нет проблем с сетью
+      apiResponse = await _fetchCharactersByNameFromApi(name, page);
+
+      await _saveCharactersToHive(apiResponse.characters);
+    } catch (e, st) {
+      // Если проблемы с сетью
+      getIt<Talker>().handle(e, st);
+
+      apiResponse = _fetchCharactersByNameFromHive(name, page);
+    }
+
+    return apiResponse;
+  }
+
+  Future<ApiResponse> _fetchCharactersByNameFromApi(
+    String name,
+    int page,
+  ) async {
+    final response = await dio
+        .get('https://rickandmortyapi.com/api/character/?page=$page&name=$name')
+        .timeout(Duration(seconds: 3));
+
+    final data = response.data as Map<String, dynamic>;
+
+    final jsonInfo = data['info'] as Map<String, dynamic>;
+
+    final info = Info.fromJson(jsonInfo);
+
+    final results = data['results'] as List<dynamic>;
+
+    final characters = results.map((json) => Character.fromJson(json)).toList();
+
+    return ApiResponse(info: info, characters: characters);
+  }
+
+  ApiResponse _fetchCharactersByNameFromHive(String name, int page) {
+    const int pageSize = 20;
+
+    final charactersByName = characterBox.values.where(
+      (character) => character.name.toLowerCase().contains(name.toLowerCase()),
+    ).toList();
+
+    final countCharacters = charactersByName.length;
+    print('Что нашел');
+    print(charactersByName);
+
+    int pages = countCharacters ~/ pageSize + 1;
+
+    final pageCharactersByName = charactersByName.sublist(
+      (page - 1) * pageSize,
+      page < pages ? page * pageSize : null,
+    );
+
+    final apiResponse = ApiResponse(
+      info: Info(currentPage: page, totalPage: pages),
+      characters: pageCharactersByName,
+    );
+
+    return apiResponse;
+  }
 }

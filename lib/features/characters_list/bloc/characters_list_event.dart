@@ -10,7 +10,7 @@ class CharactersListGetListEvent extends CharactersListEvent {
   CharactersListGetListEvent({required this.page, this.completer});
 
   @override
-  List<Object?> get props => [page, completer,];
+  List<Object?> get props => [page, completer];
 }
 
 class CharactersListToggleFavoriteEvent extends CharactersListEvent {
@@ -20,4 +20,14 @@ class CharactersListToggleFavoriteEvent extends CharactersListEvent {
 
   @override
   List<Object?> get props => [character];
+}
+
+class CharactersListSearchEvent extends CharactersListEvent {
+  final String name;
+  final int page;
+
+  CharactersListSearchEvent({required this.name, required this.page});
+
+  @override
+  List<Object?> get props => [name, page];
 }

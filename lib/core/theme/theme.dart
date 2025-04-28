@@ -40,6 +40,9 @@ final lightTheme = ThemeData(
 
 final _textTheme = const TextTheme(
   headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+  bodyMedium: TextStyle(fontSize: 16),
+  titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+  titleSmall: TextStyle(fontSize: 14),
 );
 
 final _bottomNavigationBarTheme = BottomNavigationBarThemeData(

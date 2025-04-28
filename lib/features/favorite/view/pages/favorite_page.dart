@@ -38,7 +38,10 @@ class _FavoritePageState extends State<FavoritePage>
               snap: true,
               floating: true,
               // backgroundColor: theme.primaryColor,
-              title: Text('Rick and Morty', style: theme.textTheme.headlineLarge,),
+              title: Text(
+                'Rick and Morty',
+                style: theme.textTheme.headlineLarge,
+              ),
               centerTitle: true,
               actions: [
                 IconButton(
@@ -48,7 +51,7 @@ class _FavoritePageState extends State<FavoritePage>
               ],
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(70),
-                child: SearchButton(),
+                child: SearchButton(onSearch: (text) {}, onClear: () {}),
               ),
             ),
 

@@ -21,6 +21,8 @@ class _CharactersListPageState extends State<CharactersListPage>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
 
+  String _searchText = '';
+
   @override
   void initState() {
     _scrollController.addListener(_onScroll);
@@ -45,9 +47,19 @@ class _CharactersListPageState extends State<CharactersListPage>
       if (currentState.status == CharactersListStatus.success &&
           currentState.currentPage < currentState.totalPage) {
         if (currentState.status == CharactersListStatus.loading) return;
-        getIt<CharactersListBloc>().add(
-          CharactersListGetListEvent(page: currentState.currentPage + 1),
-        );
+
+        if (currentState.isSearch) {
+          getIt<CharactersListBloc>().add(
+            CharactersListSearchEvent(
+              name: _searchText,
+              page: currentState.currentPage + 1,
+            ),
+          );
+        } else {
+          getIt<CharactersListBloc>().add(
+            CharactersListGetListEvent(page: currentState.currentPage + 1),
+          );
+        }
 
         Future.delayed(Duration(milliseconds: 50), () {
           if (_scrollController.hasClients) {
@@ -81,12 +93,15 @@ class _CharactersListPageState extends State<CharactersListPage>
               pinned: true,
               snap: true,
               floating: true,
-              // backgroundColor: theme.primaryColor,
-              title: Text('Rick and Morty', style: theme.textTheme.headlineLarge,),
+              title: Text(
+                'Rick and Morty',
+                style: theme.textTheme.headlineLarge,
+              ),
               centerTitle: true,
+              expandedHeight: 150,
               bottom: PreferredSize(
-                preferredSize: Size.fromHeight(70),
-                child: SearchButton(),
+                preferredSize: Size.fromHeight(80),
+                child: SearchButton(onSearch: _onSearch, onClear: _onClear),
               ),
             ),
 
@@ -158,6 +173,24 @@ class _CharactersListPageState extends State<CharactersListPage>
     );
   }
 
+  void _onClear() {
+    if (_searchText.isNotEmpty) {
+      _searchText = '';
+      getIt<CharactersListBloc>().add(CharactersListGetListEvent(page: 1));
+
+      _scrollToTop();
+    }
+  }
+
+  _onSearch(text) {
+    _searchText = text;
+    getIt<CharactersListBloc>().add(
+      CharactersListSearchEvent(name: _searchText, page: 1),
+    );
+
+    _scrollToTop();
+  }
+
   void _onFavoriteTap(Character character) {
     getIt<CharactersListBloc>().add(
       CharactersListToggleFavoriteEvent(character: character),
@@ -169,6 +202,14 @@ class _CharactersListPageState extends State<CharactersListPage>
     CharactersListState state,
   ) {
     getIt<FavoriteBloc>().add(FavoriteGetCharactersEvent());
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
