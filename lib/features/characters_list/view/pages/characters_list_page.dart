@@ -82,7 +82,7 @@ class _CharactersListPageState extends State<CharactersListPage>
               snap: true,
               floating: true,
               // backgroundColor: theme.primaryColor,
-              title: Text('Rick and Morty'),
+              title: Text('Rick and Morty', style: theme.textTheme.headlineLarge,),
               centerTitle: true,
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(70),

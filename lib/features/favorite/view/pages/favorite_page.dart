@@ -45,7 +45,7 @@ class _FavoritePageState extends State<FavoritePage>
               snap: true,
               floating: true,
               // backgroundColor: theme.primaryColor,
-              title: Text('Rick and Morty'),
+              title: Text('Rick and Morty', style: theme.textTheme.headlineLarge,),
               centerTitle: true,
               actions: [
                 IconButton(

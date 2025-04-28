@@ -4,6 +4,7 @@ import 'package:rick_and_morty_characters/core/repositories/characters_repositor
 import 'package:rick_and_morty_characters/features/characters_list/view/pages/characters_list_page.dart';
 import 'package:rick_and_morty_characters/features/characters_list/view/widgets/character_card.dart';
 import 'package:rick_and_morty_characters/features/favorite/view/pages/favorite_page.dart';
+import 'package:rick_and_morty_characters/features/settings/view/pages/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,11 +31,9 @@ class _HomePageState extends State<HomePage> {
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
-        children: [CharactersListPage(), FavoritePage()],
+        children: [CharactersListPage(), FavoritePage(), SettingsPage()],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: theme.primaryColor,
-        unselectedItemColor: theme.hintColor,
         currentIndex: _selectedPageIndex,
         onTap: _openPage,
         items: [
@@ -42,6 +41,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),

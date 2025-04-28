@@ -21,6 +21,7 @@ class _CharacterCardState extends State<CharacterCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final character = widget.character;
     return Card(
       child: Column(
