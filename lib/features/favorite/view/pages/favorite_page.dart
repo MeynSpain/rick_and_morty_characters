@@ -23,13 +23,6 @@ class _FavoritePageState extends State<FavoritePage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      floatingActionButton: IconButton(
-        onPressed: () {
-          getIt<FavoriteBloc>().add(FavoriteGetCharactersEvent());
-        },
-        icon: Icon(Icons.download),
-        color: theme.primaryColor,
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           final completer = Completer();
