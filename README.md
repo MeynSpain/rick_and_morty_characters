@@ -72,12 +72,18 @@ Isar, SharedPreferences).
 
 ## Скриншоты
 
-<img src="images/main_page.png" width="300">
-<img src="images/favorite_page.png" width="300">
-<img src="images/search_main.png" width="300">
-<img src="images/favorite_sort.png" width="300">
-<img src="images/settings_page_light.png" width="300">
-<img src="images/settings_page-dark.png" width="300">
+<div style="display: flex; gap: 30px; justify-content: center;">
+    <img src="images/main_page.png" alt="main_page.png" width="300" />
+    <img src="images/favorite_page.png" alt="favorite_page.png" width="300" />
+    <img src="images/search_main.png" alt="search_main.png" width="300" />
+</div>
+
+<div style="display: flex; gap: 30px; justify-content: center;">
+    <img src="images/favorite_sort.png" alt="favorite_sort.png" width="300" />
+    <img src="images/settings_page_light.png" alt="settings_page_light.png" width="300" />
+    <img src="images/settings_page_dark.png" alt="settings_page_dark.png" width="300" />
+</div>
+
 <img src="images/main_dark.png" width="300">
 
 
