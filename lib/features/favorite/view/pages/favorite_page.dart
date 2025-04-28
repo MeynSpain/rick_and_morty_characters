@@ -10,9 +10,15 @@ import 'package:rick_and_morty_characters/features/characters_list/view/widgets/
 import 'package:rick_and_morty_characters/features/favorite/bloc/favorite_bloc.dart';
 import 'package:rick_and_morty_characters/features/favorite/view/widgets/sort_bottom_sheet.dart';
 
-class FavoritePage extends StatelessWidget {
+class FavoritePage extends StatefulWidget {
   const FavoritePage({super.key});
 
+  @override
+  State<FavoritePage> createState() => _FavoritePageState();
+}
+
+class _FavoritePageState extends State<FavoritePage>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -101,10 +107,15 @@ class FavoritePage extends StatelessWidget {
   }
 
   void _showSortBottomSheet(BuildContext context) {
-    showModalBottomSheet(context: context,
-        isScrollControlled: true,
-        builder: (context) {
-      return SingleChildScrollView(child: SortBottomSheet());
-    });
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SingleChildScrollView(child: SortBottomSheet());
+      },
+    );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -45,6 +45,9 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
           errorMessage: '',
         ),
       );
+
+      add(FavoriteSortEvent(sortOption: state.currentOption, isAscending: state.isAscending));
+
     } catch (e, st) {
       getIt<Talker>().handle(e, st);
       emit(
