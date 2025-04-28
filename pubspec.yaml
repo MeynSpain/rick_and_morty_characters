@@ -37,7 +37,11 @@ dependencies:
   get_it: ^8.0.3
   equatable: ^2.0.7
   hive_flutter: ^1.1.0
+
+# Для кеширование изображений
   cached_network_image: ^3.4.1
+
+# Для логирования
   talker_flutter: ^4.7.2
   talker_bloc_logger: ^4.7.2
 
